@@ -1,4 +1,4 @@
-﻿trigger:
+trigger:
 - master
 
 pool:
@@ -18,6 +18,20 @@ steps:
     feedsToUse: 'select'
 
 # Add SonarCloud Prepare
+- task: SonarCloudPrepare@1
+  displayName: 'prepare sonarcloud'
+  inputs:
+    SonarCloud: 'sonarcloud '
+    organization: 'MeinRepo'
+    scannerMode: 'MSbuild'
+    projectKey: 'nima'
+    projectName: 'nima'
+    projectVersion: '$(Build.Buildnumber)'
+    extraProperties: |
+      sonar.cs.opencover.reportspaths=$(Build.SourcesDirectory)/TestResults/Coverage/coverage.opencover.xml
+      sonar.exclutions=**/wwwroot/lib/**/*
+
+
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -44,7 +58,11 @@ steps:
   displayName: 'Create code coverage report'
 
 # SonarCloudAnalyze
+- task: SonarCloudAnalyze@1
+  displayName: 'sonarcloud analyze'
 # SonarCloudPublish
+- task: SonarCloudPublish@1
+  displayName: 'sonarcloud publish'
 
 - task: PublishCodeCoverageResults@1
   displayName: 'Publish code coverage report'
